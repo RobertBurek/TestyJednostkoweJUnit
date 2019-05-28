@@ -12,7 +12,8 @@ import java.util.Calendar;
 /**
  * Created by Robert Burek
  */
-public class ElectrisityMeter {
+public class ElectricityMeter {
+
     TariffProvider tp;
 
     private float kwhNoTariff = 0;
@@ -48,11 +49,11 @@ public class ElectrisityMeter {
         }
     }
 
-    public boolean isTariffNow() {
-        Calendar rightNow = Calendar.getInstance();
-        int hour = rightNow.get(Calendar.HOUR_OF_DAY);
-        return hour > electricityTariffStartHour && hour < electricityTariffStartHour;
-        //return tp.isTariffNow();
+    private boolean isTariffNow() {
+//        Calendar rightNow = Calendar.getInstance();
+//        int hour = rightNow.get(Calendar.HOUR_OF_DAY);
+//        return hour > electricityTariffStartHour && hour < electricityTariffStartHour;
+        return tp.isTariffNow();
     }
 
     /**
