@@ -39,5 +39,27 @@ class ElectricityMeterTestJUnit5 {
         Assertions.assertEquals(50, electricityMeter.getKwhTariff());
     }
 
+    @Test
+    public void getHowMoreExpensiveNormalIs() {
+        //pełny zapis Executable
+//        Assertions.assertThrows(ArithmeticException.class, new Executable() {
+//            @Override
+//            public void execute() throws Throwable {
+//                ElectricityMeter electricityMeter = new ElectricityMeter();
+//                electricityMeter.setCentsForKwh(90);
+//                electricityMeter.getHowMoreExpensiveNormalIs();
+//            }
+//        });
+
+        //zapis Executable przez lambdę
+        // oczekiwany wyjątek ArithmeticException inny nie będzie obsłużony np IOException
+        Throwable exception = Assertions.assertThrows(ArithmeticException.class, () -> {
+            ElectricityMeter electricityMeter = new ElectricityMeter();
+            electricityMeter.setCentsForKwh(90);
+            electricityMeter.getHowMoreExpensiveNormalIs();
+        });
+        Assertions.assertEquals("/ by zero", exception.getMessage());
+    }
+
 
 }
