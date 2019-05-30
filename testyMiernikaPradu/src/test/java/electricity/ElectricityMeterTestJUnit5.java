@@ -1,6 +1,7 @@
 package electricity;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mockito;
 
 /**
@@ -24,6 +25,7 @@ class ElectricityMeterTestJUnit5 {
 //    @AfterAll odpowiednik @AfterClass w JUnit4
 //    @AfterEach odpowiednik @After w JUnit4
 
+    @Disabled("Bo tak ma być!!!")
     @Test
     public void givenTariffOnWhenAdditionThenKwhIncreased() {
         //Given
@@ -62,7 +64,7 @@ class ElectricityMeterTestJUnit5 {
         Assertions.assertEquals("/ by zero", exception.getMessage());
     }
 
-    @RepeatedTest(2585)
+    @RepeatedTest(85)
     public void givenMuchAdditionsWhenAdditionThenTariffChange(RepetitionInfo repetitionInfo) {
         //Given
         Mockito.when(tp.isTariffNow()).thenReturn(false);
@@ -77,5 +79,31 @@ class ElectricityMeterTestJUnit5 {
                 "Wartość licznika: " + repetitionInfo.getCurrentRepetition() * 50 + " kwh");
     }
 
+    @RepeatedTest(value = 5, name = "{displayName} {currentRepetition}/{totalRepetitions}")
+    @DisplayName("Test wielokrotny z kilkoma assercjami")
+    public void givenMuchAdditionsWhenAdditionThenTariffChangeAllAsserts(RepetitionInfo repetitionInfo) {
+        //Given
+        Mockito.when(tp.isTariffNow()).thenReturn(false);
+        //When
+        electricityMeter.addKwh(50);
+        //Then
+        Assertions.assertAll("Testing Tariff",
+                () -> Assertions.assertEquals(electricityMeter.getKwhTariff(), 0),
+                () -> Assertions.assertTrue(electricityMeter.getKwhNoTariff() % 50 == 0),
+                //inny sposób zapisu, bez lambdy
+                new Executable() {
+                    @Override
+                    public void execute() throws Throwable {
+                        Assertions.assertFalse(tp.isTariffNow());
+                    }
+                },
+                new Executable() {
+                    @Override
+                    public void execute() throws Throwable {
+                        Assertions.assertTrue(!tp.isTariffNow());
+                    }
+                }
+        );
+    }
 
 }
