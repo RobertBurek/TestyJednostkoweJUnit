@@ -1,9 +1,6 @@
 package electricity;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 
 /**
@@ -11,14 +8,14 @@ import org.mockito.Mockito;
  */
 class ElectricityMeterTestJUnit5 {
 
-    ElectricityMeter electricityMeter;
-    TariffProvider tp;
+    static ElectricityMeter electricityMeter;
+    static TariffProvider tp;
 
 //    @BeforeAll odpowiednik @BeforeClass w JUnit4
 //    @BeforeEach odpowiednik @Before w JUnit4
 
-    @BeforeEach
-    void setUp() {
+    @BeforeAll
+    public static void setUp() {
         tp = Mockito.mock(TariffProvider.class);
         electricityMeter = new ElectricityMeter(tp);
         electricityMeter.setTariffOn(true);
@@ -31,7 +28,9 @@ class ElectricityMeterTestJUnit5 {
     public void givenTariffOnWhenAdditionThenKwhIncreased() {
         //Given
         //TODO setTariff Time mock isTariffNow() !
-        Mockito.when(tp.isTariffNow()).thenReturn(true);
+        Mockito.when(tp.isTariffNow()).thenReturn(false);
+        electricityMeter = new ElectricityMeter(tp);
+        electricityMeter.setTariffOn(true);
         //When
         electricityMeter.addKwh(50);
         //Then
@@ -54,11 +53,28 @@ class ElectricityMeterTestJUnit5 {
         //zapis Executable przez lambdę
         // oczekiwany wyjątek ArithmeticException inny nie będzie obsłużony np IOException
         Throwable exception = Assertions.assertThrows(ArithmeticException.class, () -> {
+            electricityMeter = new ElectricityMeter(tp);
+            electricityMeter.setTariffOn(true);
             ElectricityMeter electricityMeter = new ElectricityMeter();
             electricityMeter.setCentsForKwh(90);
             electricityMeter.getHowMoreExpensiveNormalIs();
         });
         Assertions.assertEquals("/ by zero", exception.getMessage());
+    }
+
+    @RepeatedTest(2585)
+    public void givenMuchAdditionsWhenAdditionThenTariffChange(RepetitionInfo repetitionInfo) {
+        //Given
+        Mockito.when(tp.isTariffNow()).thenReturn(false);
+        //When
+        electricityMeter.addKwh(50);
+        System.out.println("Przebieg nr: " + repetitionInfo.getCurrentRepetition()
+                + " wartość licznika = "
+                + repetitionInfo.getCurrentRepetition() * 50 + " kwh");
+        //Then
+        Assertions.assertEquals(repetitionInfo.getCurrentRepetition() * 50,
+                electricityMeter.getKwhNoTariff(),
+                "Wartość licznika: " + repetitionInfo.getCurrentRepetition() * 50 + " kwh");
     }
 
 
